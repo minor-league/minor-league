@@ -1,0 +1,43 @@
+version: '3.3'
+services:
+  search-server-node:
+    build:
+      context: ./torch_server
+    command: uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+    # image: limdongjin/pororo:latest
+    container_name: search-server-node
+    ports:
+      - 3000:3000
+      - 8888:8888
+      - 8000:8000
+    volumes:
+      - ./:/app/workspace
+      - ./torch_server/:/app/code/
+    tty: true
+    stdin_open: true
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    networks:
+      - opensearch_search-net
+    expose:
+      - "8000"
+  logstash-node:
+    image: opensearchproject/logstash-oss-with-opensearch-output-plugin:7.16.2
+    container_name: logstash-node
+    volumes:
+      - ./logstash/pipeline/insert-game.conf:/usr/share/logstash/pipeline/logstash.conf
+      - ./datas/:/home/
+    ports:
+      - 9900:9900
+    expose:
+      - "9900"
+    networks:
+      - opensearch_search-net
+networks:
+  opensearch_search-net:
+    external: true
