@@ -6,7 +6,7 @@ import time
 import os
 from bs4 import BeautifulSoup
 import json
-#from pororo import Pororo
+from pororo import Pororo
 import datetime
 
 def login(driver):
