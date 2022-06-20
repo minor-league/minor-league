@@ -16,6 +16,37 @@ def login(driver):
 	print("login success")
 	time.sleep(3)
 
+def get_title(soup):
+	title = soup.find("p","tit-txt").getText()
+	title = remove_blank(title)
+
+	return title
+
+def get_tag(soup):
+	tag_names = []
+	tags = soup.find_all("span","tag")
+	for tag in tags:
+		tag_names.append(tag.getText().strip()[1:])
+
+	return tag_names
+
+def get_contents(soup):
+	article = soup.find("article","article-item fr-view")
+	sentences = ""
+	sentence_list = article.findChildren("p")
+	for sentence in sentence_list:
+		sentences += sentence.getText()
+	article_html = str(article)
+
+	return sentences,article_html
+
+def get_reply(soup):
+	replys = []
+	rs = soup.find_all("div","reply-txt")
+	for r in rs:
+		replys.append(r.find("p").getText())
+	return replys
+
 def get_name(soup):
 	names = []
 	name_tags = soup.find_all("span","writer-title grade_2")
@@ -41,6 +72,32 @@ def remove_blank(s):
 	s = s[1:].strip()
 	return s
 
+def get_topic(doc):
+
+	zs = Pororo(task = 'zero-topic')
+	number = len(doc)//200
+	rst = {
+		"귀여운":0,
+		"감동적인":0,
+		"활기찬":0,
+		"우울한":0,
+		"어두운":0,
+		"슬픈":0
+	}
+
+	for i in range(number):
+		zz = zs(doc[i*200:(i+1)*200],["귀여운","감동적인","활기찬","우울한","어두운","슬픈"])
+		for key,value in zz.items():
+			rst[key] += value
+
+	zz = zs(doc[number*200:],["귀여운","감동적인","활기찬","우울한","어두운","슬픈"])
+	for key,value in zz.items():
+		rst[key] += value
+		rst[key] /= (number+1)
+	
+	return rst
+
+
 def check(title):
 	file_name = './data.json'
 	
@@ -54,7 +111,7 @@ def check(title):
 
 	return False
 
-def convert_to_json(title,desc,sentences,tag_names,replys,names,genre,rec,link,article_html):
+def convert_to_json(title,desc,sentences,tag_names,replys,names,genre,rec,topic,link,article_html):
 	file_name = './data.json'
 
 	with open(file_name) as f:
@@ -69,6 +126,7 @@ def convert_to_json(title,desc,sentences,tag_names,replys,names,genre,rec,link,a
 		"reply_writer":names,
 		"genre":genre,
 		"rec":rec,
+		"mood":topic,
 		"link":link,
 		"article_html":article_html
 	})
@@ -129,54 +187,46 @@ def crawl():
         soup = BeautifulSoup(soup_file,features="html.parser")
 
         #get title
-        title = soup.find("p","tit-txt").getText()
-        title = remove_blank(title)
-        if check(title) == True:
-            continue
+	title = get_title(soup)
+	if check(title) == True:
+		continue
 
-        #get genre
-        genre = get_genre(soup)
+	#get genre
+	genre = get_genre(soup)
 
-        #get tag
-        tag_names = []
-        tags = soup.find_all("span","tag")
-        for tag in tags:
-            tag_names.append(tag.getText().strip()[1:])
+	#get tag
+	tag_names = get_tag(soup)
 
-        #get description
-        desc = soup.find("p","game-desc").getText()
+	#get description
+	desc = soup.find("p","game-desc").getText()
 
-        #get article
-        article = soup.find("article","article-item fr-view")
-        sentences = ""
-        sentence_list = article.findChildren("p")
-        for sentence in sentence_list:
-            sentences += sentence.getText()
-        article_html = str(article)
-        #print(sentences)
+	#get contents
+	sentences, article_html = get_contents(soup)
 
-        driver.execute_script('window.scrollTo(0,3000)')
-        time.sleep(1)
+	driver.execute_script('window.scrollTo(0,3000)')
+	time.sleep(1)
 
-        #get reply
-        soup_file = driver.page_source
-        soup = BeautifulSoup(soup_file,features="html.parser")
-        replys = []
-        rs = soup.find_all("div","reply-txt")
-        for r in rs:
-            replys.append(r.find("p").getText())
+	#get reply
+	soup_file = driver.page_source
+	soup = BeautifulSoup(soup_file,features="html.parser")
+	replys = get_reply(soup)
 
-        #get name
-        names = get_name(soup)
+	#get name
+	names = get_name(soup)
 
-        #get rec
-        rec = get_rec(soup)
+	#get topic(tag)
+	topic = get_topic(desc)
+	#topic = []
 
-        #make json file
-        convert_to_json(title,desc,sentences,tag_names,replys,names,genre,rec,link,article_html)
-        print('crawling document #'+str(idx)+'done')
+	#get rec
+	rec = get_rec(soup)
 
+	#make json file
+	convert_to_json(title,desc,sentences,tag_names,replys,names,genre,rec,topic,link,article_html)
+	print('crawling document #'+str(idx)+'done')
+	
     print("crawling documents done")
+
 
 def schedule():
     s = BackgroundScheduler(timezone='Asia/Seoul')
