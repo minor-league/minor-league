@@ -1,6 +1,6 @@
 import pandas as pd
 import math
-#from pororo import Pororo
+from pororo import Pororo
 from sklearn.feature_extraction.text import TfidfVectorizer
 from konlpy.tag import Hannanum
 from sklearn.metrics.pairwise import linear_kernel
@@ -61,7 +61,6 @@ def filter_tag(tags,inputs,rst):
 
 def get_sentiment_score(reply):
 
-	return 0
 	sa = Pororo(task="sentiment", model="brainbert.base.ko.nsmc", lang="ko")
 	score = 0
 	
