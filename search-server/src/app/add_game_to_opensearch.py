@@ -130,8 +130,8 @@ def getOpenSearch():
 def main():
     client = getOpenSearch()
     
-    client.indices.delete(GAME)
-    client.indices.delete(GAME_SENTENCE)
+    #client.indices.delete(GAME)
+    #client.indices.delete(GAME_SENTENCE)
     createGameAndGameSentence(client)
     
     from datas import datas
