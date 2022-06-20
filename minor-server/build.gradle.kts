@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.resolve.disableContractsInsideContractsBlock
 
 plugins {
     val kotlinVersion = "1.6.21"
@@ -10,7 +11,7 @@ plugins {
     kotlin("plugin.jpa") version kotlinVersion
     id("org.flywaydb.flyway") version "8.4.4"
 
-    id("org.jlleitschuh.gradle.ktlint") version "10.1.0"
+//    id("org.jlleitschuh.gradle.ktlint") version "10.1.0"
 }
 
 group = "limdongjin"
@@ -58,7 +59,6 @@ dependencies {
     implementation("org.flywaydb:flyway-core:8.4.4")
     implementation("org.flywaydb:flyway-mysql:8.4.4")
 
-    // TODO jjwt api upgrade 0.11.5
     compileOnly("io.jsonwebtoken:jjwt-api:0.11.2")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.2")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.2")
@@ -72,8 +72,8 @@ dependencies {
     }
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("io.projectreactor:reactor-test")
-//    testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
-//    testImplementation("com.ninja-squad:springmockk:3.1.1")
+    //    testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
+    //    testImplementation("com.ninja-squad:springmockk:3.1.1")
 }
 
 val snippetsDir by extra {
@@ -90,10 +90,11 @@ tasks {
     withType<Test> {
         useJUnitPlatform()
     }
-    ktlint {
-        verbose.set(true)
-        disabledRules.addAll("import-ordering")
-    }
+//    ktlint {
+//        verbose.set(false)
+//
+//        disabledRules.addAll("import-ordering")
+//    }
     flyway {
         url = "jdbc:mysql://localhost:53306/minor?characterEncoding=UTF-8&serverTimezone=UTC"
         user = "user1"

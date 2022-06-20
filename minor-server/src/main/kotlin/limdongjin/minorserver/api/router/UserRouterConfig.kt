@@ -27,22 +27,6 @@ class UserRouterConfig {
         "/api/user".nest {
             GET("/me", handler::getMyInformation)
 
-//            filter { serverRequest, function ->
-//                try {
-//                    loginUserResolver.getUser(serverRequest.awaitBody())
-//                }catch (ex: CredentialNotFoundException){
-//                    val status = HttpStatus.UNAUTHORIZED
-//                    return@filter ServerResponse.status(status).bodyValueAndAwait(
-//                        badResponseFormat(
-//                            message = "Unauthorized",
-//                            path = serverRequest.path(),
-//                            httpStatus = status
-//                        ))
-//                }
-
-//                function.invoke(serverRequest)
-//            }
-
             onDefaultErrors()
         }
     }

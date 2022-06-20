@@ -3,6 +3,7 @@ services:
   opensearch-node1:
     image: opensearchproject/opensearch:2.0.0
     container_name: opensearch-node1
+    restart: always
     environment:
       - network.host=0.0.0.0
       - cluster.name=opensearch-cluster
@@ -35,10 +36,11 @@ services:
     expose:
       - "9200"
     networks:
-      - search-net
+      - minor-service-net
   opensearch-dashboards:
     image: opensearchproject/opensearch-dashboards:2.0.0
     container_name: opensearch-dashboards
+    restart: always
     ports:
       - 5601:5601
     expose:
@@ -49,8 +51,9 @@ services:
     #volumes:
     #  - ./config/opensearch_dashboards.yml:/usr/share/opensearch-dashboards/config/opensearch_dashboards.yml
     networks:
-      - search-net
+      - minor-service-net
 volumes:
   opensearch-data1:
 networks:
-  search-net:
+  minor-service-net:
+    external: true

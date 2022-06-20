@@ -15,23 +15,7 @@ class SearchRouterConfig {
     fun searchApiRoutes(handler: SearchApiHandler) = coRouter {
         "/api/search".nest {
             POST("/game", handler::searchDefault)
-
-//            filter { serverRequest, function ->
-//                try {
-//                    loginUserResolver.getUser(serverRequest.awaitBody())
-//                }catch (ex: CredentialNotFoundException){
-//                    val status = HttpStatus.UNAUTHORIZED
-//                    return@filter ServerResponse.status(status).bodyValueAndAwait(
-//                        badResponseFormat(
-//                            message = "Unauthorized",
-//                            path = serverRequest.path(),
-//                            httpStatus = status
-//                        ))
-//                }
-
-//                function.invoke(serverRequest)
-//            }
-
+            POST("/game-sentence", handler::searchSentence)
             onDefaultErrors()
         }
     }
